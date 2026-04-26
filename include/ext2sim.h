@@ -8,6 +8,9 @@
 #define EXT2SIM_BLOCK_SIZE 1024
 #define EXT2SIM_ROOT_INODE 2
 
+#define EXT2SIM_S_IFMT  0xF000
+#define EXT2SIM_S_IFDIR 0x4000
+#define EXT2SIM_S_IFREG 0x8000
 
 typedef struct
 {
@@ -46,7 +49,6 @@ typedef struct
     u32 direct[12];
     u8 reserved[64]; 
 }ext2sim_inode;
-
 
 
 #endif
