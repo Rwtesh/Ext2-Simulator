@@ -6,7 +6,7 @@
 
 static int check(int x)
 {
-    printf("hello\n");
+    // printf("hello %d\n",x);
     return x;
 }
 static int is_abs_path(const char* p)
@@ -38,8 +38,8 @@ static int is_dir_inode(disk_t* d, ext2sim_superblock* sb, u32 ino)
 {
     ext2sim_inode in;
     if (inode_read(d, sb, ino, &in) != 0) return 0;
-
-    return (in.mode & EXT2SIM_S_IFDIR) == EXT2SIM_S_IFDIR;
+    check(7);
+    return (in.mode & EXT2SIM_DIR) == EXT2SIM_DIR;
 
 }
 
@@ -48,16 +48,16 @@ static u32 step_component(disk_t* d, ext2sim_superblock* sb, u32 cur, const char
     if (strcmp(comp, ".") == 0) {
         return cur;
     }
+    check(0);
     if (strcmp(comp, "..") == 0) {
-        // If we're at root, keep it at root (robust behavior)
+        // If we're at root stay there
         if (cur == EXT2SIM_ROOT_INODE) return cur;
 
-        // Resolve via the ".." directory entry
+        // resolve usng the ".." dirent
         u32 up = dirent_lookup(d, sb, cur, "..");
         if (up == 0) return 0;
         return up;
     }
-
     return dirent_lookup(d, sb, cur, comp);
 }
 
@@ -108,7 +108,7 @@ int path_parent(disk_t* d,ext2sim_superblock* sb,const char* abs_path,u32* paren
         if (nlen == (size_t)-1) return -1;
 
         if (nlen == 0) {
-            // comp is leaf (we intentionally do NOT interpret "." / ".." as leaf here)
+            // comp is leaf we intentionally do not interpret "." / ".." as lleaf
             strncpy(leaf_out, comp, EXT2SIM_NAME_MAX);
             leaf_out[EXT2SIM_NAME_MAX] = '\0';
             *parent_ino_out = cur;

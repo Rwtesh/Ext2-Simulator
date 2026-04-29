@@ -8,9 +8,9 @@
 #define EXT2SIM_BLOCK_SIZE 1024
 #define EXT2SIM_ROOT_INODE 2
 
-#define EXT2SIM_S_IFMT  0xF000
-#define EXT2SIM_S_IFDIR 0x4000
-#define EXT2SIM_S_IFREG 0x8000
+#define EXT2SIM_MT  0xF000
+#define EXT2SIM_DIR 0x4000
+#define EXT2SIM_REG 0x8000
 
 typedef struct
 {

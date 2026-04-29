@@ -106,3 +106,38 @@ int dirent_add(disk_t* d,ext2sim_superblock* sb, u32 dir_no,const char* name, u3
 
     return 0;
 }
+int dirent_remove(disk_t* d, ext2sim_superblock* sb, u32 dir_no, const char* name)
+{
+    if (!d || !sb || !isValid(name)) return -1;
+
+    ext2sim_inode dir;
+    if (inode_read(d, sb, dir_no, &dir) != 0) return -1;
+
+    u32 blocks_used = (dir.size + sb->block_size - 1) / sb->block_size;
+    if (blocks_used > 12) blocks_used = 12;
+
+    u8 buf[EXT2SIM_BLOCK_SIZE];
+
+    for (u32 bi = 0; bi < blocks_used; bi++) {
+        u32 blk = dir.direct[bi];
+        if (blk == 0) continue;
+
+        if (disk_read_block(d, blk, buf) != 0) return -1;
+
+        ext2sim_dirent* ent = (ext2sim_dirent*)buf;
+        for (u32 ei = 0; ei < DIRENTS_PER_BLOCK; ei++) {
+            if (ent[ei].inode == 0) continue;
+
+            ent[ei].name[EXT2SIM_NAME_MAX] = '\0';
+            if (!strncmp((char*)ent[ei].name, name, EXT2SIM_NAME_MAX)) {
+                ent[ei].inode = 0;
+                memset(ent[ei].name, 0, sizeof(ent[ei].name)); // optional
+
+                if (disk_write_block(d, blk, buf) != 0) return -1;
+                return 0;
+            }
+        }
+    }
+
+    return -1; 
+}

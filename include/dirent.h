@@ -10,7 +10,7 @@
 typedef struct
 {
     u32 inode;
-    u8 name[EXT2SIM_NAME_MAX + 1];
+    char name[EXT2SIM_NAME_MAX + 1];
 }ext2sim_dirent;//total size=64(64 bytes so a block contains exactly 16 entries)
 
 
@@ -18,5 +18,5 @@ typedef struct
 
 u32 dirent_lookup(disk_t* d,ext2sim_superblock* sb, u32 dir_no, const char* name);
 int dirent_add(disk_t* d,ext2sim_superblock* sb, u32 dir_no,const char* name, u32 ino);
-
+int dirent_remove(disk_t* d, ext2sim_superblock* sb, u32 dir_no, const char* name);
 #endif

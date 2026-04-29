@@ -11,7 +11,7 @@
 
 int jsfortest(int yo)
 {
-    printf("Here rn %d \n",yo);
+    // printf("Here rn %d \n",yo);
     return yo;
 }
 

@@ -2,6 +2,7 @@
 #include "../include/disk.h"
 #include "../include/mkfs.h"
 #include "../include/types.h"
+#include "../include/dirent.h"
 
 #include<stdlib.h>
 #include<stdio.h>
@@ -77,7 +78,7 @@ if (total_blocks <= FIRST_DATA_BLK) {
 //     perror("mkfs: fputc");
 //     fclose(fp);
 //     return -1;
-// }
+// }you
 
 // if (fclose(fp) != 0) {
 //     perror("mkfs: fclose");
@@ -102,8 +103,13 @@ if (total_blocks <= FIRST_DATA_BLK) {
     sb.inode_table_block=ITABLE_BLK;
     sb.first_data_block=FIRST_DATA_BLK;
 
-    u32 used_blocks=FIRST_DATA_BLK;
+    //Root directory uses FIRST_DATA_BLK as its directory block
+    const u32 ROOT_DIR_BLK = FIRST_DATA_BLK;
+
+    //NOTE: we must count ROOT_DIR_BLK as used, otherwise alloc_block() may hand it out again
+    u32 used_blocks=FIRST_DATA_BLK+1;
     sb.free_blocks=total_blocks-used_blocks;
+
     u32 used_inodes=2;
     sb.free_inodes=total_inodes-used_inodes;
 
@@ -135,6 +141,10 @@ if (total_blocks <= FIRST_DATA_BLK) {
     memset(bbm,0,sizeof(bbm));
     for(u32 i=0;i<FIRST_DATA_BLK;i++)
         bitmap_set(bbm,i);
+
+    //mark ROOT_DIR_BLK as used too
+    bitmap_set(bbm,ROOT_DIR_BLK);
+
     if(disk_write_block(&d,BBM_BLK,bbm))
     {
         disk_close(&d);
@@ -163,11 +173,34 @@ if (total_blocks <= FIRST_DATA_BLK) {
     }
     // printf("hello6\n");
 
+    //initialize root directory block with "." and ".."
+    u8 root_dir_block[EXT2SIM_BLOCK_SIZE];
+    memset(root_dir_block,0,sizeof(root_dir_block));
+
+    ext2sim_dirent* dent = (ext2sim_dirent*)root_dir_block;
+
+    dent[0].inode = EXT2SIM_ROOT_INODE;
+    memset(dent[0].name,0,sizeof(dent[0].name));
+    strncpy((char*)dent[0].name,".",EXT2SIM_NAME_MAX);
+    dent[0].name[EXT2SIM_NAME_MAX]='\0';
+
+    dent[1].inode = EXT2SIM_ROOT_INODE;
+    memset(dent[1].name,0,sizeof(dent[1].name));
+    strncpy((char*)dent[1].name,"..",EXT2SIM_NAME_MAX);
+    dent[1].name[EXT2SIM_NAME_MAX]='\0';
+
+    if(disk_write_block(&d,ROOT_DIR_BLK,root_dir_block))
+    {
+        disk_close(&d);
+        return -1;
+    }
+
     ext2sim_inode root;
     memset(&root,0,sizeof(root));
     root.mode=0x4000;
     root.links_count=2;
-    root.size=0;
+    root.size=block_size;
+    root.direct[0]=ROOT_DIR_BLK;
     
     u32 ino = EXT2SIM_ROOT_INODE;
     u32 idx0 = ino - 1;
