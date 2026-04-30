@@ -1,0 +1,7 @@
+# Build artifacts
+*.o
+ext2sim
+ext2sim-fuse
+
+# Disk images used for testing
+*.img
