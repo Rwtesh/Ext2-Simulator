@@ -3,8 +3,8 @@
  *
  * Build:  see Makefile (target ext2sim-fuse)
  * Usage:  ext2sim-fuse <image> <mountpoint> [FUSE options]
- *         ext2sim-fuse disk.img /mnt/ext2 -f          # foreground
- *         ext2sim-fuse disk.img /mnt/ext2 -o ro       # read-only
+ *         ext2sim-fuse disk.img /mnt/ext2 -f        # foreground
+ *         ext2sim-fuse disk.img /mnt/ext2 -o ro     # read-only
  * Unmount: fusermount3 -u <mountpoint>
  */
 
@@ -757,7 +757,7 @@ static void usage(const char *prog)
         "  <image>       Path to the ext2sim disk image\n"
         "  <mountpoint>  Directory to mount the filesystem at\n\n"
         "Common FUSE options:\n"
-        "  -f            Run in the foreground (do not daemonise)\n"
+        "  -f            Run in the foreground (do not daemonize)\n"
         "  -d            Debug mode (implies -f)\n"
         "  -o ro         Mount read-only\n"
         "  -s            Single-threaded mode\n\n"

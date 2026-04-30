@@ -34,7 +34,7 @@ sudo apt install gcc make libncurses-dev fuse3 libfuse3-dev
 
 ```bash
 make          # builds both ext2sim and ext2sim-fuse
-make clean    # remove build artefacts
+make clean    # remove build artifacts
 ```
 
 ---
